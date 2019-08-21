@@ -122,14 +122,8 @@ public class MissionAdapter extends Adapter<ViewHolder> {
                         break;
                 }
 
-                if (mStartButton != null && mPauseButton != null) switch (msg.what) {
-                    case DownloadManagerService.MESSAGE_DELETED:
-                    case DownloadManagerService.MESSAGE_ERROR:
-                    case DownloadManagerService.MESSAGE_FINISHED:
-                    case DownloadManagerService.MESSAGE_PAUSED:
-                        checkMasterButtonsVisibility();
-                        break;
-                }
+                if (mStartButton != null && mPauseButton != null)
+                    checkMasterButtonsVisibility();
             }
         };
 
@@ -163,8 +157,7 @@ public class MissionAdapter extends Adapter<ViewHolder> {
             mPendingDownloadsItems.remove(h);
             if (mPendingDownloadsItems.size() < 1) {
                 setAutoRefresh(false);
-                if (mStartButton != null) mStartButton.setVisible(false);
-                if (mPauseButton != null) mPauseButton.setVisible(false);
+                checkMasterButtonsVisibility();
             }
         }
 
@@ -540,6 +533,8 @@ public class MissionAdapter extends Adapter<ViewHolder> {
     }
 
     private boolean handlePopupItem(@NonNull ViewHolderItem h, @NonNull MenuItem option) {
+        if (h.item == null) return true;
+
         int id = option.getItemId();
         DownloadMission mission = h.item.mission instanceof DownloadMission ? (DownloadMission) h.item.mission : null;
 
@@ -662,11 +657,11 @@ public class MissionAdapter extends Adapter<ViewHolder> {
         if (mEmptyMessage.getVisibility() != flag) mEmptyMessage.setVisibility(flag);
     }
 
-    private void checkMasterButtonsVisibility() {
+    public void checkMasterButtonsVisibility() {
         boolean[] state = mIterator.hasValidPendingMissions();
 
-        mStartButton.setVisible(state[0]);
-        mPauseButton.setVisible(state[1]);
+        mPauseButton.setVisible(state[0]);
+        mStartButton.setVisible(state[1]);
     }
 
     public void ensurePausedMissions() {
